@@ -1,0 +1,20 @@
+{
+	"schemaVersion": 1,
+	"id": "heartline-showcase",
+	"version": "1.0.0",
+	"name": "Heartline showcase",
+	"description": "Development-only film director for Heartline's gallery video. Not shipped.",
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"dev.heartline.showcase.HeartlineShowcaseFabric"
+		]
+	},
+	"depends": {
+		"heartline": "*"
+	},
+	"mixins": [
+		"heartline_showcase.mixins.json"
+	]
+}

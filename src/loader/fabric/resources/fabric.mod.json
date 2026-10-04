@@ -1,0 +1,42 @@
+{
+	"schemaVersion": 1,
+	"id": "heartline",
+	"version": "${version}",
+	"name": "Heartline",
+	"description": "Health bars above mobs, floating damage numbers with crits and combos, a target panel with hits-to-kill, and low-health alerts for your pets. Client-side only.",
+	"icon": {
+		"16": "assets/heartline/icon16.png",
+		"32": "assets/heartline/icon32.png",
+		"128": "assets/heartline/icon128.png"
+	},
+	"authors": [
+		"comedy01"
+	],
+	"license": "MIT",
+	"contact": {
+		"homepage": "https://github.com/comedy01/Heartline",
+		"sources": "https://github.com/comedy01/Heartline",
+		"issues": "https://github.com/comedy01/Heartline/issues"
+	},
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"dev.heartline.fabric.HeartlineFabric"
+		],
+		"modmenu": [
+			"dev.heartline.fabric.HeartlineModMenu"
+		]
+	},
+	"mixins": [
+		"heartline.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"fabric-api": "*",
+		"minecraft": "${range}",
+		"java": ">=${java_version}"
+	},
+	"suggests": {
+		"modmenu": "*"
+	}
+}

@@ -1,0 +1,11 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+
+[[mods]]
+modId="heartline_selftest"
+version="1.0.0"
+displayName="Heartline self test"
+
+[[mixins]]
+config="heartline_selftest.mixins.json"
