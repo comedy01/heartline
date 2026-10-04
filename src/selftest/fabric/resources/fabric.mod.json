@@ -1,0 +1,20 @@
+{
+	"schemaVersion": 1,
+	"id": "heartline-selftest",
+	"version": "1.0.0",
+	"name": "Heartline self test",
+	"description": "Development-only in-world checks for Heartline. Not shipped.",
+	"license": "MIT",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"dev.heartline.selftest.fabric.HeartlineSelfTestFabric"
+		]
+	},
+	"depends": {
+		"heartline": "*"
+	},
+	"mixins": [
+		"heartline_selftest.mixins.json"
+	]
+}
