@@ -1,6 +1,7 @@
 package dev.heartline.client;
 
 import dev.heartline.core.Category;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -78,7 +79,8 @@ public final class Entities {
     }
 
     public static boolean nameTagShown(LivingEntity entity) {
-        return entity instanceof Player || entity.shouldShowName();
+        return entity instanceof Player || entity.shouldShowName()
+                || (entity.hasCustomName() && Minecraft.getInstance().crosshairPickEntity == entity);
     }
 
     public static boolean canSee(Level level, Vec3 eye, LivingEntity entity, Entity viewer) {
