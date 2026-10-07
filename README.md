@@ -4,7 +4,7 @@ See every mob's health at a glance. Heartline puts a clean health bar above each
 
 Heartline is a client-side mod for Minecraft on Fabric, NeoForge and Forge, so it works on any server. It is compatible with Mod Menu on Fabric.
 
-Supported versions: 1.20 to 26.3 on Fabric, 1.21 to 26.3 on NeoForge, 1.20.1 on Forge.
+Supported versions: 1.18.2, 1.19.2 and 1.20 to 26.3 on Fabric, 1.21 to 26.3 on NeoForge, and 1.16.5, 1.18.2, 1.19.2 and 1.20.1 on Forge.
 
 ## Features
 
@@ -38,8 +38,8 @@ Optional: add [Mod Menu](https://modrinth.com/mod/modmenu) to get a settings scr
 
 **Forge**
 
-1. Install [Forge](https://files.minecraftforge.net/) for Minecraft 1.20.1.
-2. Put the Forge Heartline jar in your `mods` folder.
+1. Install [Forge](https://files.minecraftforge.net/) for your version of Minecraft.
+2. Put the Forge Heartline jar for your version in your `mods` folder.
 3. Start the game. The settings screen is in *Mods > Heartline > Config*.
 
 ## Keys
