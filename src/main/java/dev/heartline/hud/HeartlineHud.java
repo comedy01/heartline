@@ -403,9 +403,17 @@ public final class HeartlineHud {
         return 10;
     }
 
+    private static int shieldWidth(Canvas canvas, String health, int armor) {
+        return armor > 0 ? 7 + canvas.textWidth(Integer.toString(armor)) + (health.isEmpty() ? 0 : 6) : 0;
+    }
+
+    private static int infoWidth(Canvas canvas, String health, int armor) {
+        return shieldWidth(canvas, health, armor) + canvas.textWidth(health);
+    }
+
     private static void drawInfoRow(Canvas canvas, String health, int armor, int centerX, int y, float alpha, boolean centered) {
         String armorText = armor > 0 ? Integer.toString(armor) : "";
-        int shieldWidth = armor > 0 ? 7 + canvas.textWidth(armorText) + (health.isEmpty() ? 0 : 6) : 0;
+        int shieldWidth = shieldWidth(canvas, health, armor);
         int total = shieldWidth + canvas.textWidth(health);
         if (total == 0) {
             return;
@@ -498,7 +506,7 @@ public final class HeartlineHud {
         }
         LivingEntity entity = tracked.entity();
         Category category = Entities.category(entity, player);
-        if (config.isHidden(Entities.type(entity))) {
+        if (!shows(config, category) || config.isHidden(Entities.type(entity))) {
             return;
         }
         panelDrawn = true;
@@ -515,7 +523,23 @@ public final class HeartlineHud {
             return;
         }
 
-        int width = 128;
+        String name = Entities.name(entity);
+        String tag = category == Category.PET ? Texts.translatable("heartline.panel.pet").getString() : "";
+        HealthText style = config.healthText() == HealthText.OFF ? HealthText.VALUE : config.healthText();
+        String health = Numbers.health(style, tracked.health(), tracked.max());
+        int armor = config.armor() ? Entities.armor(entity) : 0;
+        String hitsText = "";
+        boolean oneHit = false;
+        if (config.hitsToKill() && category != Category.PET && category != Category.PLAYER) {
+            int hits = Numbers.hitsToKill(tracked.health(), Entities.attackDamage(player));
+            if (hits > 0) {
+                oneHit = hits == 1;
+                hitsText = Texts.translatable(hits == 1 ? "heartline.panel.hit" : "heartline.panel.hits", hits).getString();
+            }
+        }
+        int nameWidth = canvas.textWidth(name) + (tag.isEmpty() ? 0 : 8 + canvas.textWidth(tag));
+        int infoWidth = infoWidth(canvas, health, armor) + (hitsText.isEmpty() ? 0 : 8 + canvas.textWidth(hitsText));
+        int width = Math.min(Math.max(128, Math.max(nameWidth, infoWidth) + 10), canvas.width() - 8);
         int height = 38;
         int x;
         if (position == PanelPosition.TOP_CENTER) {
@@ -529,34 +553,24 @@ public final class HeartlineHud {
         canvas.fill(x, y, x + width, y + height, 0xA0000000);
         canvas.fill(x, y, x + 2, y + height, category.color());
 
-        String name = Entities.name(entity);
         canvas.text(name, x + 6, y + 4, Palette.lerp(category.color(), WHITE, 0.55F));
-        if (category == Category.PET) {
-            String tag = Texts.translatable("heartline.panel.pet").getString();
+        if (!tag.isEmpty()) {
             canvas.text(tag, x + width - 4 - canvas.textWidth(tag), y + 4, 0xFFB0B0B0);
         }
 
+        int barWidth = width - 12;
         canvas.push();
-        canvas.translate(x + 6 + 58, y + 20);
-        fillBar(canvas, config, tracked, category, 116, 5, 1.0F, partial);
+        canvas.translate(x + 6 + barWidth / 2, y + 20);
+        fillBar(canvas, config, tracked, category, barWidth, 5, 1.0F, partial);
         canvas.pop();
 
-        HealthText style = config.healthText() == HealthText.OFF ? HealthText.VALUE : config.healthText();
-        String health = Numbers.health(style, tracked.health(), tracked.max());
-        int armor = config.armor() ? Entities.armor(entity) : 0;
         canvas.push();
         canvas.translate(x + 6, y + 24);
         drawInfoRow(canvas, health, armor, 0, 1, 1.0F, false);
         canvas.pop();
 
-        if (config.hitsToKill() && category != Category.PET && category != Category.PLAYER) {
-            float hit = Entities.attackDamage(player);
-            int hits = Numbers.hitsToKill(tracked.health(), hit);
-            if (hits > 0) {
-                String text = Texts.translatable(hits == 1 ? "heartline.panel.hit" : "heartline.panel.hits", hits)
-                        .getString();
-                canvas.text(text, x + width - 4 - canvas.textWidth(text), y + 25, hits == 1 ? CRIT : 0xFFD0D0D0);
-            }
+        if (!hitsText.isEmpty()) {
+            canvas.text(hitsText, x + width - 4 - canvas.textWidth(hitsText), y + 25, oneHit ? CRIT : 0xFFD0D0D0);
         }
     }
 

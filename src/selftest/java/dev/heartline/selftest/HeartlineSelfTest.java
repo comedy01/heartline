@@ -255,6 +255,22 @@ public final class HeartlineSelfTest {
             screenshot(mc, "no-overhead");
             config.setOverhead(true);
         });
+        then(1, () -> config.setHostile(false));
+        then(3, () -> {
+            check(!HeartlineHud.panelDrawn(), "Hostile is off but the target panel still showed the zombie");
+            check(!HeartlineHud.drew(zombie.getId()), "Hostile is off but the zombie still got a bar");
+            config.setHostile(true);
+            run(mc, "attribute @e[type=minecraft:husk,limit=1] minecraft:max_health base set 350");
+            run(mc, "attribute @e[type=minecraft:husk,limit=1] minecraft:generic.max_health base set 350");
+        });
+        then(5, () -> run(mc, "data merge entity @e[type=minecraft:husk,limit=1] {Health:349.8f}"));
+        within(40, () -> zombie.getMaxHealth() > 300.0F && zombie.getHealth() > 300.0F, () -> {
+            check(HeartlineHud.panelDrawn(), "the target panel did not show the high health zombie");
+            screenshot(mc, "panel-wide");
+            run(mc, "attribute @e[type=minecraft:husk,limit=1] minecraft:max_health base set 20");
+            run(mc, "attribute @e[type=minecraft:husk,limit=1] minecraft:generic.max_health base set 20");
+            run(mc, "data merge entity @e[type=minecraft:husk,limit=1] {Health:14f}");
+        });
         then(10, () -> {
             check(Tracker.toggleHidden(zombie), "the hide toggle did not hide the zombie type");
             check(config.isHidden("minecraft:husk"), "the zombie type was not saved as hidden");
