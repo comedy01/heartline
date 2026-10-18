@@ -9,7 +9,7 @@ Supported versions: 1.18.2, 1.19.2 and 1.20 to 26.3 on Fabric, 1.21 to 26.3 on N
 ## Features
 
 - **Health bars above mobs** - drawn flat on your screen, so they stay sharp and readable at any distance.
-- **10 bar styles** - Flat, Segmented (one notch per heart), Slim, Pip, Outline, Glass, Neon, Capsule, Gauge (a tick per heart) and Bracket.
+- **11 bar styles** - Flat, Segmented (one notch per heart), Slim, Pip, Outline, Glass, Neon, Capsule, Gauge (a tick per heart), Bracket and Hearts (vanilla hearts).
 - **Colors by health or by mob type** - green to yellow to red as a mob gets hurt, or red hostile, yellow neutral, green passive, blue players, purple pets and bosses.
 - **Damage trail** - the health a hit took stays visible for a moment, then drains away, so you can see how much each hit did. The bar flashes white on a hit and glows green on a heal.
 - **Damage numbers** - numbers float up beside the mob. Your critical hits show in gold with a "!", heals show in green.
@@ -60,7 +60,7 @@ Both keys are unbound by default. Set them in *Options > Controls > Key Binds > 
 | Show | Always / When Hurt / In Combat / Crosshair Only | When Hurt | When a mob's bar shows. The mob under your crosshair always shows its bar |
 | Range | 8 - 64 blocks | 24 | How far away bars still show |
 | Hide Behind Walls | on / off | on | Hide the bars of mobs you can't see |
-| Style | Flat / Segmented / Slim / Pip / Outline / Glass / Neon / Capsule / Gauge / Bracket | Segmented | How the bar looks |
+| Style | Flat / Segmented / Slim / Pip / Outline / Glass / Neon / Capsule / Gauge / Bracket / Hearts | Segmented | How the bar looks |
 | Colors | By Health / By Mob Type | By Health | How the bar is colored |
 | Bar Size | 0.5 - 2.0 | 1.0 | Makes the bars bigger or smaller |
 | Bar Height | -0.5 - 1.5 blocks | 0.0 | Moves the bars up or down |

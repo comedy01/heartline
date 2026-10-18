@@ -268,6 +268,92 @@ final class StyledBars {
         canvas.pop();
     }
 
+    private static final String[] HEART = {
+            "..OO.OO..",
+            ".OrrOrrO.",
+            "OrwrrrrrO",
+            "OrrrrrrrO",
+            "OdrrrrrdO",
+            ".OdrrrdO.",
+            "..OdrdO..",
+            "...OdO...",
+            "....O...."
+    };
+    private static final int[] HEART_FULL = {0xFFFF1313, 0xFFFFC8C8, 0xFFBB1313};
+    private static final int[] HEART_BLINK = {0xFFFFA1A1, 0xFFFFE3E3, 0xFFDEA1A1};
+    private static final int HEART_EMPTY = 0xFF282828;
+    private static final int PER_ROW = 10;
+
+    static int heartsHeight(Tracked tracked, int width) {
+        int rows = heartRows(HeartlineHud.segments(Math.max(tracked.max(), 0.001F)));
+        return (int) Math.ceil(heartPixel(width, Integer.MAX_VALUE, rows) * (rows * 10 - 1));
+    }
+
+    static int heartsNativeHeight(Tracked tracked) {
+        return heartRows(HeartlineHud.segments(Math.max(tracked.max(), 0.001F))) * 10 - 1;
+    }
+
+    private static int heartRows(int hearts) {
+        return (hearts + PER_ROW - 1) / PER_ROW;
+    }
+
+    private static float heartPixel(int width, int height, int rows) {
+        return Math.min(width / (8.0F * PER_ROW + 1.0F), height / (rows * 10.0F - 1.0F));
+    }
+
+    static void hearts(Canvas canvas, HeartlineConfig config, Tracked tracked, Category category,
+                       int width, int height, float alpha, float partial) {
+        State s = new State(config, tracked, category, partial);
+        float max = Math.max(tracked.max(), 0.001F);
+        int hearts = s.segments;
+        int rows = heartRows(hearts);
+        int cols = Math.min(hearts, PER_ROW);
+        float perHalf = max > 40.0F ? max / 20.0F : 1.0F;
+        int filled = (int) Math.ceil(s.shown * max / perHalf - 0.001F);
+        int trailed = s.trailOn ? (int) Math.ceil(s.trail * max / perHalf - 0.001F) : filled;
+        int outline = s.flash > 0.3F ? WHITE : BLACK;
+        canvas.push();
+        canvas.scale(heartPixel(width, height, rows));
+        int left = -(8 * cols + 1) / 2;
+        for (int i = 0; i < hearts; i++) {
+            int hx = left + 8 * (i % PER_ROW);
+            int hy = -9 - 10 * (i / PER_ROW);
+            for (int y = 0; y < 9; y++) {
+                String row = HEART[y];
+                int runStart = 0;
+                int runColor = 0;
+                for (int x = 0; x <= 9; x++) {
+                    int color = x < 9 ? heartColor(row.charAt(x), 2 * i + (x < 5 ? 0 : 1), filled, trailed, outline) : 0;
+                    if (x == 9 || color != runColor) {
+                        if (runColor != 0) {
+                            canvas.fill(hx + runStart, hy + y, hx + x, hy + y + 1, a(runColor, alpha));
+                        }
+                        runStart = x;
+                        runColor = color;
+                    }
+                }
+            }
+        }
+        canvas.pop();
+    }
+
+    private static int heartColor(char code, int half, int filled, int trailed, int outline) {
+        if (code == '.') {
+            return 0;
+        }
+        if (code == 'O') {
+            return outline;
+        }
+        int shade = code == 'w' ? 1 : code == 'd' ? 2 : 0;
+        if (half < filled) {
+            return HEART_FULL[shade];
+        }
+        if (half < trailed) {
+            return HEART_BLINK[shade];
+        }
+        return HEART_EMPTY;
+    }
+
     private static void bracketPair(Canvas canvas, int x0, int y0, int x1, int y1, int arm, int t, int color, int grow) {
         int ax0 = x0 - grow;
         int ax1 = x1 + grow;

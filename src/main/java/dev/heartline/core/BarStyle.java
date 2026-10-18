@@ -22,7 +22,9 @@ public enum BarStyle implements Choice {
     @SerializedName("gauge")
     GAUGE("gauge", 5),
     @SerializedName("bracket")
-    BRACKET("bracket", 4);
+    BRACKET("bracket", 4),
+    @SerializedName("hearts")
+    HEARTS("hearts", 5);
 
     private final String id;
     private final int height;
