@@ -104,7 +104,8 @@ public final class HeartlineHud {
                 continue;
             }
             Vec3 pos = entity.getPosition(partial);
-            double top = pos.y + entity.getBbHeight() + 0.3 + config.height() + (Entities.nameTagShown(entity) ? 0.35 : 0.0);
+            boolean tagged = Entities.nameTagShown(entity);
+            double top = pos.y + entity.getBbHeight() + 0.3 + config.height() + (tagged ? 0.35 : 0.0);
             double dx = pos.x - projection.cameraX();
             double dy = top - projection.cameraY();
             double dz = pos.z - projection.cameraZ();
@@ -138,6 +139,9 @@ public final class HeartlineHud {
             float x = OUT[0];
             float y = OUT[1];
             scale = clamp(scale, MIN_SCALE, MAX_SCALE) * (float) config.scale();
+            if (tagged && projection.project(pos.x, pos.y + entity.getBbHeight() + 0.5, pos.z, OUT)) {
+                y = Math.min(y, OUT[1] - (4 + canvas.lineHeight()) * TEXT * scale);
+            }
             bars.add(new Bar(tracked, category, x, y, scale, alpha, distance));
         }
         bars.sort(Comparator.comparingDouble(Bar::distance).reversed());
@@ -171,7 +175,7 @@ public final class HeartlineHud {
         canvas.push();
         canvas.translate(bar.x(), bar.y());
         canvas.scale(bar.scale());
-        int height = config.style().height();
+        int height = config.style() == BarStyle.HEARTS ? StyledBars.heartsHeight(tracked, BAR_WIDTH) : config.style().height();
         fillBar(canvas, config, tracked, bar.category(), BAR_WIDTH, height, alpha, partial);
 
         if (bar.scale() * TEXT >= 0.28F) {
@@ -214,6 +218,9 @@ public final class HeartlineHud {
                 return;
             case BRACKET:
                 StyledBars.bracket(canvas, config, tracked, category, width, height, alpha, partial);
+                return;
+            case HEARTS:
+                StyledBars.hearts(canvas, config, tracked, category, width, height, alpha, partial);
                 return;
             default:
                 fillFlat(canvas, config, tracked, category, width, height, alpha, partial);
@@ -513,7 +520,8 @@ public final class HeartlineHud {
         if (position == PanelPosition.CROSSHAIR) {
             canvas.push();
             canvas.translate(canvas.width() / 2.0F, canvas.height() / 2.0F + 14.0F);
-            fillBar(canvas, config, tracked, category, 36, 3, 0.9F, partial);
+            int crossHeight = config.style() == BarStyle.HEARTS ? StyledBars.heartsHeight(tracked, 36) : 3;
+            fillBar(canvas, config, tracked, category, 36, crossHeight, 0.9F, partial);
             canvas.push();
             canvas.scale(TEXT);
             String health = Numbers.health(config.healthText(), tracked.health(), tracked.max());
@@ -540,7 +548,8 @@ public final class HeartlineHud {
         int nameWidth = canvas.textWidth(name) + (tag.isEmpty() ? 0 : 8 + canvas.textWidth(tag));
         int infoWidth = infoWidth(canvas, health, armor) + (hitsText.isEmpty() ? 0 : 8 + canvas.textWidth(hitsText));
         int width = Math.min(Math.max(128, Math.max(nameWidth, infoWidth) + 10), canvas.width() - 8);
-        int height = 38;
+        int barHeight = config.style() == BarStyle.HEARTS ? StyledBars.heartsNativeHeight(tracked) : 5;
+        int height = 33 + barHeight;
         int x;
         if (position == PanelPosition.TOP_CENTER) {
             x = canvas.width() / 2 - width / 2;
@@ -560,17 +569,18 @@ public final class HeartlineHud {
 
         int barWidth = width - 12;
         canvas.push();
-        canvas.translate(x + 6 + barWidth / 2, y + 20);
-        fillBar(canvas, config, tracked, category, barWidth, 5, 1.0F, partial);
+        int barBottom = y + 15 + barHeight;
+        canvas.translate(x + 6 + barWidth / 2, barBottom);
+        fillBar(canvas, config, tracked, category, barWidth, barHeight, 1.0F, partial);
         canvas.pop();
 
         canvas.push();
-        canvas.translate(x + 6, y + 24);
+        canvas.translate(x + 6, barBottom + 4);
         drawInfoRow(canvas, health, armor, 0, 1, 1.0F, false);
         canvas.pop();
 
         if (!hitsText.isEmpty()) {
-            canvas.text(hitsText, x + width - 4 - canvas.textWidth(hitsText), y + 25, oneHit ? CRIT : 0xFFD0D0D0);
+            canvas.text(hitsText, x + width - 4 - canvas.textWidth(hitsText), barBottom + 5, oneHit ? CRIT : 0xFFD0D0D0);
         }
     }
 

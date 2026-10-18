@@ -706,7 +706,7 @@ public final class Showcase {
 
         if (wanted("styles")) {
             BarStyle[] styles = {BarStyle.SEGMENTED, BarStyle.FLAT, BarStyle.SLIM, BarStyle.PIP, BarStyle.OUTLINE,
-                    BarStyle.GLASS, BarStyle.NEON, BarStyle.CAPSULE, BarStyle.GAUGE, BarStyle.BRACKET};
+                    BarStyle.GLASS, BarStyle.NEON, BarStyle.CAPSULE, BarStyle.GAUGE, BarStyle.BRACKET, BarStyle.HEARTS};
             scene(mc, config, group, () -> group(mc), () -> lookAt(mc, middle));
             record("04-styles", 55 * (styles.length + 1), f -> {
                 lookAt(mc, middle);

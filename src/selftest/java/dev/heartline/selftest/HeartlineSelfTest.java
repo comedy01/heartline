@@ -239,6 +239,8 @@ public final class HeartlineSelfTest {
         then(5, () -> screenshot(mc, "style-gauge"));
         then(1, () -> config.setStyle(BarStyle.BRACKET));
         then(5, () -> screenshot(mc, "style-bracket"));
+        then(1, () -> config.setStyle(BarStyle.HEARTS));
+        then(5, () -> screenshot(mc, "style-hearts"));
         then(1, () -> config.setStyle(BarStyle.SEGMENTED));
         then(5, () -> run(mc, "item replace entity @p weapon.mainhand with minecraft:air"));
         within(20, () -> Entities.attackDamage(mc.player) < swordDamage - 0.5F, () -> {
