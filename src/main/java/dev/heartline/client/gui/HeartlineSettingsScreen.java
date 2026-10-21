@@ -60,8 +60,16 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
                 toggle("heartline.options.names", config::names, config::setNames),
                 cycle("heartline.options.health_text", HealthText.values(), config::healthText, config::setHealthText));
         addRow(
+                toggle("heartline.options.name_players", config::namePlayers, config::setNamePlayers),
+                toggle("heartline.options.name_mobs", config::nameMobs, config::setNameMobs));
+        addRow(
                 toggle("heartline.options.armor", config::armor, config::setArmor),
                 toggle("heartline.options.trail", config::trail, config::setTrail));
+        addRow(
+                slider("heartline.options.heart_rows", HeartlineConfig.MIN_HEART_ROWS, HeartlineConfig.MAX_HEART_ROWS,
+                        1, config.heartRows(), value -> Integer.toString((int) value),
+                        value -> config.setHeartRows((int) value)),
+                toggle("heartline.options.cascade_hearts", config::cascadeHearts, config::setCascadeHearts));
 
         addHeader(Texts.translatable("heartline.options.section.mobs"));
         addRow(
@@ -73,7 +81,7 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
         addRow(
                 toggle("heartline.options.bosses", config::bosses, config::setBosses),
                 toggle("heartline.options.pets", config::pets, config::setPets));
-        addRow(hiddenButton(config), null);
+        addRow(hiddenButton(config), sizesButton(config));
 
         addHeader(Texts.translatable("heartline.options.section.numbers"));
         addRow(
@@ -101,7 +109,7 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
         HeartlineClient.saveConfig();
     }
 
-    private static String oneDecimal(double value) {
+    static String oneDecimal(double value) {
         return String.format(Locale.ROOT, "%.1f", value);
     }
 
@@ -110,6 +118,13 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
                         button -> ScreenOpener.open(minecraft, new HiddenMobsScreen(this, options,
                                 () -> new HeartlineSettingsScreen(lastScreen, options)))),
                 Texts.translatable("heartline.options.hidden.tooltip"));
+    }
+
+    private AbstractWidget sizesButton(HeartlineConfig config) {
+        return tooltip(button(Texts.translatable("heartline.options.sizes", config.sizedCount()), WIDTH,
+                        button -> ScreenOpener.open(minecraft, new MobSizesScreen(this, options,
+                                () -> new HeartlineSettingsScreen(lastScreen, options)))),
+                Texts.translatable("heartline.options.sizes.tooltip"));
     }
 
     private AbstractWidget keyBindsButton() {
@@ -157,8 +172,8 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
                 Texts.translatable(key + ".tooltip"));
     }
 
-    private static final class StepSlider extends AbstractSliderButton {
-        private final String captionKey;
+    static final class StepSlider extends AbstractSliderButton {
+        private final Component caption;
         private final double min;
         private final double max;
         private final double step;
@@ -167,8 +182,13 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
 
         StepSlider(String captionKey, double min, double max, double step, double initial,
                    DoubleFunction<String> format, DoubleConsumer onChange) {
+            this(Texts.translatable(captionKey), min, max, step, initial, format, onChange);
+        }
+
+        StepSlider(Component caption, double min, double max, double step, double initial,
+                   DoubleFunction<String> format, DoubleConsumer onChange) {
             super(0, 0, WIDTH, HEIGHT, Texts.empty(), 0.0);
-            this.captionKey = captionKey;
+            this.caption = caption;
             this.min = min;
             this.max = max;
             this.step = step;
@@ -191,7 +211,7 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
         @Override
         protected void updateMessage() {
             Component shown = Texts.literal(format.apply(current()));
-            setMessage(Texts.translatable("options.generic_value", Texts.translatable(captionKey), shown));
+            setMessage(Texts.translatable("options.generic_value", caption, shown));
         }
 
         @Override

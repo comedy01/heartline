@@ -63,7 +63,7 @@ Both keys are unbound by default. Set them in *Options > Controls > Key Binds > 
 | Style | Flat / Segmented / Slim / Pip / Outline / Glass / Neon / Capsule / Gauge / Bracket / Hearts | Segmented | How the bar looks |
 | Colors | By Health / By Mob Type | By Health | How the bar is colored |
 | Bar Size | 0.5 - 2.0 | 1.0 | Makes the bars bigger or smaller |
-| Bar Height | -0.5 - 1.5 blocks | 0.0 | Moves the bars up or down |
+| Bar Height | -0.5 - 5.0 blocks | 0.0 | Moves the bars up or down |
 | Mob Names | on / off | on | Show the mob's name above its bar |
 | Health Text | 14 / 20, 70%, Hearts, Off | 14 / 20 | How the health under the bar reads |
 | Armor | on / off | on | Show a shield with the mob's armor points |

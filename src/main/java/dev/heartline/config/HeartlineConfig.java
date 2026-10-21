@@ -19,7 +19,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class HeartlineConfig {
     public static final String FILE_NAME = "heartline.json";
@@ -29,9 +31,13 @@ public final class HeartlineConfig {
     public static final double MIN_SCALE = 0.5;
     public static final double MAX_SCALE = 2.0;
     public static final double MIN_HEIGHT = -0.5;
-    public static final double MAX_HEIGHT = 1.5;
+    public static final double MAX_HEIGHT = 5.0;
+    public static final double MIN_MOB_HEIGHT = -5.0;
+    public static final double MAX_MOB_HEIGHT = 25.0;
     public static final int MIN_FADE = 1;
     public static final int MAX_FADE = 30;
+    public static final int MIN_HEART_ROWS = 1;
+    public static final int MAX_HEART_ROWS = 20;
     public static final int MIN_PET_ALERT = 10;
     public static final int MAX_PET_ALERT = 60;
 
@@ -54,6 +60,10 @@ public final class HeartlineConfig {
     private double scale = 1.0;
     private double height = 0.0;
     private boolean names = true;
+    private boolean namePlayers = true;
+    private boolean nameMobs = true;
+    private int heartRows = 2;
+    private boolean cascadeHearts = false;
     private HealthText healthText = HealthText.VALUE;
     private boolean armor = true;
     private boolean trail = true;
@@ -67,6 +77,8 @@ public final class HeartlineConfig {
     private boolean petAlert = true;
     private int petAlertPercent = 30;
     private List<String> hidden = new ArrayList<>();
+    private Map<String, Double> sizes = new LinkedHashMap<>();
+    private Map<String, Double> heights = new LinkedHashMap<>();
 
     public boolean enabled() {
         return enabled;
@@ -196,6 +208,42 @@ public final class HeartlineConfig {
         names = value;
     }
 
+    public boolean namePlayers() {
+        return namePlayers;
+    }
+
+    public void setNamePlayers(boolean value) {
+        namePlayers = value;
+    }
+
+    public boolean nameMobs() {
+        return nameMobs;
+    }
+
+    public void setNameMobs(boolean value) {
+        nameMobs = value;
+    }
+
+    public boolean showsName(boolean player) {
+        return names && (player ? namePlayers : nameMobs);
+    }
+
+    public int heartRows() {
+        return heartRows;
+    }
+
+    public void setHeartRows(int value) {
+        heartRows = clamp(value, MIN_HEART_ROWS, MAX_HEART_ROWS);
+    }
+
+    public boolean cascadeHearts() {
+        return cascadeHearts;
+    }
+
+    public void setCascadeHearts(boolean value) {
+        cascadeHearts = value;
+    }
+
     public HealthText healthText() {
         return healthText;
     }
@@ -318,11 +366,62 @@ public final class HeartlineConfig {
         hidden.clear();
     }
 
+    public double size(String type) {
+        Double value = sizes.get(type);
+        return value == null ? 1.0 : value;
+    }
+
+    public void setSize(String type, double value) {
+        double clamped = clamp(value, MIN_SCALE, MAX_SCALE);
+        if (Math.abs(clamped - 1.0) < 0.001) {
+            sizes.remove(type);
+        } else {
+            sizes.put(type, clamped);
+        }
+    }
+
+    public double mobHeight(String type) {
+        Double value = heights.get(type);
+        return value == null ? 0.0 : value;
+    }
+
+    public void setMobHeight(String type, double value) {
+        double clamped = clamp(value, MIN_MOB_HEIGHT, MAX_MOB_HEIGHT);
+        if (Math.abs(clamped) < 0.001) {
+            heights.remove(type);
+        } else {
+            heights.put(type, clamped);
+        }
+    }
+
+    public boolean isResized(String type) {
+        return sizes.containsKey(type) || heights.containsKey(type);
+    }
+
+    public int sizedCount() {
+        int count = sizes.size();
+        for (String type : heights.keySet()) {
+            if (!sizes.containsKey(type)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public void clearSizes() {
+        sizes.clear();
+        heights.clear();
+    }
+
     public void resetToDefaults() {
-        List<String> keep = hidden;
+        List<String> keepHidden = hidden;
+        Map<String, Double> keepSizes = sizes;
+        Map<String, Double> keepHeights = heights;
         HeartlineConfig defaults = new HeartlineConfig();
         copyFrom(defaults);
-        hidden = keep;
+        hidden = keepHidden;
+        sizes = keepSizes;
+        heights = keepHeights;
     }
 
     private void copyFrom(HeartlineConfig other) {
@@ -342,6 +441,10 @@ public final class HeartlineConfig {
         scale = other.scale;
         height = other.height;
         names = other.names;
+        namePlayers = other.namePlayers;
+        nameMobs = other.nameMobs;
+        heartRows = other.heartRows;
+        cascadeHearts = other.cascadeHearts;
         healthText = other.healthText;
         armor = other.armor;
         trail = other.trail;
@@ -355,6 +458,8 @@ public final class HeartlineConfig {
         petAlert = other.petAlert;
         petAlertPercent = other.petAlertPercent;
         hidden = new ArrayList<>(other.hidden);
+        sizes = new LinkedHashMap<>(other.sizes);
+        heights = new LinkedHashMap<>(other.heights);
     }
 
     private void sanitize() {
@@ -369,10 +474,29 @@ public final class HeartlineConfig {
         setNumberScale(numberScale);
         setPanel(panel);
         setPetAlertPercent(petAlertPercent);
+        setHeartRows(heartRows);
         if (hidden == null) {
             hidden = new ArrayList<>();
         }
         hidden.removeIf(type -> type == null || type.isEmpty());
+        Map<String, Double> raw = sizes;
+        sizes = new LinkedHashMap<>();
+        if (raw != null) {
+            raw.forEach((type, value) -> {
+                if (type != null && !type.isEmpty() && value != null) {
+                    setSize(type, value);
+                }
+            });
+        }
+        Map<String, Double> rawHeights = heights;
+        heights = new LinkedHashMap<>();
+        if (rawHeights != null) {
+            rawHeights.forEach((type, value) -> {
+                if (type != null && !type.isEmpty() && value != null) {
+                    setMobHeight(type, value);
+                }
+            });
+        }
     }
 
     private static int clamp(int value, int min, int max) {

@@ -8,6 +8,7 @@ import dev.heartline.client.Tracked;
 import dev.heartline.client.Tracker;
 import dev.heartline.client.gui.HeartlineSettingsScreen;
 import dev.heartline.client.gui.HiddenMobsScreen;
+import dev.heartline.client.gui.MobSizesScreen;
 import dev.heartline.config.HeartlineConfig;
 import dev.heartline.core.BarStyle;
 import dev.heartline.core.Category;
@@ -269,6 +270,18 @@ public final class HeartlineSelfTest {
         within(40, () -> zombie.getMaxHealth() > 300.0F && zombie.getHealth() > 300.0F, () -> {
             check(HeartlineHud.panelDrawn(), "the target panel did not show the high health zombie");
             screenshot(mc, "panel-wide");
+            config.setStyle(BarStyle.HEARTS);
+            config.setHeartRows(3);
+            config.setSize("minecraft:husk", 2.0);
+            config.setNameMobs(false);
+        });
+        then(5, () -> {
+            check(HeartlineHud.drew(zombie.getId()), "the big hearts bar was not drawn");
+            screenshot(mc, "hearts-rows");
+            config.setStyle(BarStyle.SEGMENTED);
+            config.setHeartRows(2);
+            config.setSize("minecraft:husk", 1.0);
+            config.setNameMobs(true);
             run(mc, "attribute @e[type=minecraft:husk,limit=1] minecraft:max_health base set 20");
             run(mc, "attribute @e[type=minecraft:husk,limit=1] minecraft:generic.max_health base set 20");
             run(mc, "data merge entity @e[type=minecraft:husk,limit=1] {Health:14f}");
@@ -367,6 +380,26 @@ public final class HeartlineSelfTest {
         });
         then(10, () -> {
             check(!config.isHidden("minecraft:bat"), "Show All did not show the mob again");
+            config.setSize("minecraft:bat", 1.5);
+            config.setMobHeight("minecraft:bat", 10.0);
+            Screens.open(mc, new MobSizesScreen(null, mc.options, () -> null));
+        });
+        then(10, () -> {
+            Screen screen = Screens.current(mc);
+            check(screen instanceof MobSizesScreen, "the mob sizes screen did not open");
+            screenshot(mc, "mob-sizes");
+            click(mc, findText(screen, "Minecraft (1 changed)"));
+        });
+        then(10, () -> {
+            Screen screen = Screens.current(mc);
+            check(find(screen, "entity.minecraft.bat").getMessage().getString().endsWith("1.5x"),
+                    "the bat slider does not show its saved size");
+            screenshot(mc, "mob-sizes-vanilla");
+            click(mc, find(screen, "heartline.options.mob_sizes.reset_mod"));
+        });
+        then(10, () -> {
+            check(config.sizedCount() == 0, "Reset This Mod left sizes behind: " + config.sizedCount());
+            check(config.mobHeight("minecraft:bat") == 0.0, "Reset This Mod left the bat height behind");
             Screens.open(mc, null);
         });
         then(10, () -> {
