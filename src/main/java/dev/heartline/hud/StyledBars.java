@@ -284,40 +284,56 @@ final class StyledBars {
     private static final int HEART_EMPTY = 0xFF282828;
     private static final int PER_ROW = 10;
 
-    static int heartsHeight(Tracked tracked, int width) {
-        int rows = heartRows(HeartlineHud.segments(Math.max(tracked.max(), 0.001F)));
-        return (int) Math.ceil(heartPixel(width, Integer.MAX_VALUE, rows) * (rows * 10 - 1));
+    static int heartsHeight(HeartlineConfig config, Tracked tracked, int width) {
+        int rows = heartRows(heartCount(config, tracked.max()));
+        return (int) Math.ceil(heartPixel(width, Integer.MAX_VALUE, config, rows) * heartsTall(config, rows));
     }
 
-    static int heartsNativeHeight(Tracked tracked) {
-        return heartRows(HeartlineHud.segments(Math.max(tracked.max(), 0.001F))) * 10 - 1;
+    static int heartsNativeHeight(HeartlineConfig config, Tracked tracked) {
+        return (int) Math.ceil(heartsTall(config, heartRows(heartCount(config, tracked.max()))));
+    }
+
+    private static float rowStep(HeartlineConfig config, int rows) {
+        return config.cascadeHearts() ? Math.max(Math.min(12.5F - rows, 10.0F), 3.5F) : 10.0F;
+    }
+
+    private static float heartsTall(HeartlineConfig config, int rows) {
+        return (rows - 1) * rowStep(config, rows) + 9;
+    }
+
+    static int heartCount(HeartlineConfig config, float max) {
+        int needed = (int) Math.ceil(Math.max(max, 0.001F) / 2.0F);
+        return Math.max(1, Math.min(needed, config.heartRows() * PER_ROW));
     }
 
     private static int heartRows(int hearts) {
         return (hearts + PER_ROW - 1) / PER_ROW;
     }
 
-    private static float heartPixel(int width, int height, int rows) {
-        return Math.min(width / (8.0F * PER_ROW + 1.0F), height / (rows * 10.0F - 1.0F));
+    private static float heartPixel(int width, int height, HeartlineConfig config, int rows) {
+        return Math.min(width / (8.0F * PER_ROW + 1.0F), height / heartsTall(config, rows));
     }
 
     static void hearts(Canvas canvas, HeartlineConfig config, Tracked tracked, Category category,
                        int width, int height, float alpha, float partial) {
         State s = new State(config, tracked, category, partial);
         float max = Math.max(tracked.max(), 0.001F);
-        int hearts = s.segments;
+        int hearts = heartCount(config, max);
         int rows = heartRows(hearts);
         int cols = Math.min(hearts, PER_ROW);
-        float perHalf = max > 40.0F ? max / 20.0F : 1.0F;
+        float perHalf = Math.ceil(max / 2.0F) > hearts ? max / (2.0F * hearts) : 1.0F;
         int filled = (int) Math.ceil(s.shown * max / perHalf - 0.001F);
         int trailed = s.trailOn ? (int) Math.ceil(s.trail * max / perHalf - 0.001F) : filled;
         int outline = s.flash > 0.3F ? WHITE : BLACK;
         canvas.push();
-        canvas.scale(heartPixel(width, height, rows));
+        float step = rowStep(config, rows);
+        canvas.scale(heartPixel(width, height, config, rows));
         int left = -(8 * cols + 1) / 2;
-        for (int i = 0; i < hearts; i++) {
+        for (int i = hearts - 1; i >= 0; i--) {
             int hx = left + 8 * (i % PER_ROW);
-            int hy = -9 - 10 * (i / PER_ROW);
+            int hy = -9;
+            canvas.push();
+            canvas.translate(0.0F, -step * (i / PER_ROW));
             for (int y = 0; y < 9; y++) {
                 String row = HEART[y];
                 int runStart = 0;
@@ -333,6 +349,7 @@ final class StyledBars {
                     }
                 }
             }
+            canvas.pop();
         }
         canvas.pop();
     }

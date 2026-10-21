@@ -105,7 +105,7 @@ public final class HeartlineHud {
             }
             Vec3 pos = entity.getPosition(partial);
             boolean tagged = Entities.nameTagShown(entity);
-            double top = pos.y + entity.getBbHeight() + 0.3 + config.height() + (tagged ? 0.35 : 0.0);
+            double top = pos.y + entity.getBbHeight() + 0.3 + config.height() + config.mobHeight(Entities.type(entity)) + (tagged ? 0.35 : 0.0);
             double dx = pos.x - projection.cameraX();
             double dy = top - projection.cameraY();
             double dz = pos.z - projection.cameraZ();
@@ -138,7 +138,7 @@ public final class HeartlineHud {
             }
             float x = OUT[0];
             float y = OUT[1];
-            scale = clamp(scale, MIN_SCALE, MAX_SCALE) * (float) config.scale();
+            scale = clamp(scale, MIN_SCALE, MAX_SCALE) * (float) (config.scale() * config.size(Entities.type(entity)));
             if (tagged && projection.project(pos.x, pos.y + entity.getBbHeight() + 0.5, pos.z, OUT)) {
                 y = Math.min(y, OUT[1] - (4 + canvas.lineHeight()) * TEXT * scale);
             }
@@ -175,14 +175,14 @@ public final class HeartlineHud {
         canvas.push();
         canvas.translate(bar.x(), bar.y());
         canvas.scale(bar.scale());
-        int height = config.style() == BarStyle.HEARTS ? StyledBars.heartsHeight(tracked, BAR_WIDTH) : config.style().height();
+        int height = config.style() == BarStyle.HEARTS ? StyledBars.heartsHeight(config, tracked, BAR_WIDTH) : config.style().height();
         fillBar(canvas, config, tracked, bar.category(), BAR_WIDTH, height, alpha, partial);
 
         if (bar.scale() * TEXT >= 0.28F) {
             canvas.push();
             canvas.scale(TEXT);
             int barTop = -(int) Math.ceil(height / TEXT);
-            if (config.names()) {
+            if (config.showsName(bar.category() == Category.PLAYER)) {
                 String name = Entities.name(entity);
                 int color = Palette.alpha(Palette.lerp(bar.category().color(), WHITE, 0.55F), alpha);
                 canvas.text(name, -canvas.textWidth(name) / 2, barTop - canvas.lineHeight() - 1, color);
@@ -520,7 +520,7 @@ public final class HeartlineHud {
         if (position == PanelPosition.CROSSHAIR) {
             canvas.push();
             canvas.translate(canvas.width() / 2.0F, canvas.height() / 2.0F + 14.0F);
-            int crossHeight = config.style() == BarStyle.HEARTS ? StyledBars.heartsHeight(tracked, 36) : 3;
+            int crossHeight = config.style() == BarStyle.HEARTS ? StyledBars.heartsHeight(config, tracked, 36) : 3;
             fillBar(canvas, config, tracked, category, 36, crossHeight, 0.9F, partial);
             canvas.push();
             canvas.scale(TEXT);
@@ -548,7 +548,7 @@ public final class HeartlineHud {
         int nameWidth = canvas.textWidth(name) + (tag.isEmpty() ? 0 : 8 + canvas.textWidth(tag));
         int infoWidth = infoWidth(canvas, health, armor) + (hitsText.isEmpty() ? 0 : 8 + canvas.textWidth(hitsText));
         int width = Math.min(Math.max(128, Math.max(nameWidth, infoWidth) + 10), canvas.width() - 8);
-        int barHeight = config.style() == BarStyle.HEARTS ? StyledBars.heartsNativeHeight(tracked) : 5;
+        int barHeight = config.style() == BarStyle.HEARTS ? StyledBars.heartsNativeHeight(config, tracked) : 5;
         int height = 33 + barHeight;
         int x;
         if (position == PanelPosition.TOP_CENTER) {
