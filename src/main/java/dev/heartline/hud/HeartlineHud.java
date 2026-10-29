@@ -98,6 +98,10 @@ public final class HeartlineHud {
             if (!shows(config, category) || config.isHidden(Entities.type(entity))) {
                 continue;
             }
+            // The mount's bar sits right in front of the rider's camera.
+            if (entity == player.getVehicle()) {
+                continue;
+            }
             boolean looking = entity.getId() == lookId;
             boolean pet = category == Category.PET && config.pets();
             if (!looking && !tracked.visible()) {
