@@ -106,6 +106,9 @@ public final class Showcase {
         boolean run(int frame);
     }
 
+    private record Portrait(BarStyle style, String type, String extra, double distance, double look) {
+    }
+
     private record Key(int move, int hold, Vec3 target) {
     }
 
@@ -717,6 +720,35 @@ public final class Showcase {
                     shot(step >= styles.length ? "colors-by-type" : "style-" + styles[step].id());
                 }
             });
+        }
+
+        if (wanted("gallery")) {
+            Portrait[] portraits = {
+                    new Portrait(BarStyle.FLAT, "cow", health(6, 10), 3.4, 0.8),
+                    new Portrait(BarStyle.SEGMENTED, "husk", health(12, 20), 3.0, 1.2),
+                    new Portrait(BarStyle.SLIM, "pig", health(4, 10), 2.6, 0.5),
+                    new Portrait(BarStyle.PIP, "sheep", ",Color:6b" + health(5, 8), 2.9, 0.7),
+                    new Portrait(BarStyle.OUTLINE, "creeper", health(11, 20), 3.0, 1.0),
+                    new Portrait(BarStyle.GLASS, "enderman", health(24, 40), 4.6, 1.8),
+                    new Portrait(BarStyle.NEON, "spider", health(9, 16), 3.2, 0.5),
+                    new Portrait(BarStyle.CAPSULE, "iron_golem", health(60, 100), 5.0, 1.6),
+                    new Portrait(BarStyle.GAUGE, "pillager",
+                            health(14, 24) + ",equipment:{mainhand:{id:\"minecraft:crossbow\"}}", 3.0, 1.2),
+                    new Portrait(BarStyle.BRACKET, "horse", ",Variant:3" + health(18, 30), 4.2, 1.2),
+                    new Portrait(BarStyle.HEARTS, "fox", health(6, 10), 2.4, 0.4)};
+            for (Portrait portrait : portraits) {
+                Vec3 target = at(GROUP, portrait.look(), ROW);
+                scene(mc, config, at(GROUP, 0, ROW - portrait.distance()), () -> {
+                    summon(mc, portrait.type(), at(GROUP, 0, ROW), portrait.extra());
+                    config.setStyle(portrait.style());
+                }, () -> lookAt(mc, target));
+                record("gallery-" + portrait.style().id(), 40, f -> {
+                    lookAt(mc, target);
+                    if (f == 25) {
+                        shot("style-" + portrait.style().id());
+                    }
+                });
+            }
         }
 
         if (wanted("crosshair")) {
