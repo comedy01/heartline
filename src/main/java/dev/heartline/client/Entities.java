@@ -79,7 +79,10 @@ public final class Entities {
     }
 
     public static boolean nameTagShown(LivingEntity entity) {
-        return entity instanceof Player || entity.shouldShowName()
+        if (entity instanceof Player) {
+            return !HeartlineClient.config().hidesVanillaNames();
+        }
+        return entity.shouldShowName()
                 || (entity.hasCustomName() && Minecraft.getInstance().crosshairPickEntity == entity);
     }
 

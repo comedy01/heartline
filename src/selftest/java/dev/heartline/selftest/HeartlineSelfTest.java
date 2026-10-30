@@ -317,6 +317,10 @@ public final class HeartlineSelfTest {
             check(Tracker.petWarning().contains("%"), "the pet warning has no percentage: " + Tracker.petWarning());
             screenshot(mc, "pet-warning");
             config.setPanel(PanelPosition.CROSSHAIR);
+            config.setVanillaNames(false);
+            check(!Entities.nameTagShown(mc.player), "Vanilla Names is off but player bars still make room for a name tag");
+            config.setVanillaNames(true);
+            check(Entities.nameTagShown(mc.player), "Vanilla Names is on but player bars no longer make room for a name tag");
         });
         then(5, () -> {
             check(HeartlineHud.panelDrawn(), "the crosshair panel was not drawn");

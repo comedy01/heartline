@@ -64,10 +64,15 @@ Both keys are unbound by default. Set them in *Options > Controls > Key Binds > 
 | Colors | By Health / By Mob Type | By Health | How the bar is colored |
 | Bar Size | 0.5 - 2.0 | 1.0 | Makes the bars bigger or smaller |
 | Bar Height | -0.5 - 5.0 blocks | 0.0 | Moves the bars up or down |
-| Mob Names | on / off | on | Show the mob's name above its bar |
+| Names | on / off | on | Show a name above each bar. Turn off to hide every name |
+| Player Names | on / off | on | Show names above player bars. Needs Names on |
+| Mob Names | on / off | on | Show names above mob bars. Needs Names on |
+| Vanilla Names | on / off | on | Minecraft's own name tags above other players. Turn off to see only Heartline's names |
 | Health Text | 14 / 20, 70%, Hearts, Off | 14 / 20 | How the health under the bar reads |
 | Armor | on / off | on | Show a shield with the mob's armor points |
 | Damage Trail | on / off | on | Show the health a hit took, then drain it away |
+| Heart Rows | 1 - 20 | 2 | The most rows of hearts the Hearts style draws. Mobs with more health get hearts that each stand for more health |
+| Cascading Hearts | on / off | off | Rows of hearts overlap more the more rows there are, like the vanilla health bar |
 | Fade After | 1 - 30 s | 6 s | How long a bar stays after a mob was last hurt or healed to full |
 | Hostile / Neutral / Passive Mobs, Players, Bosses | on / off | on | Which kinds of mobs get bars |
 | Always Show My Pets | on / off | on | Your tamed pets always show their bars |

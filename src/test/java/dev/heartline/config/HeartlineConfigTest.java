@@ -165,4 +165,19 @@ class HeartlineConfigTest {
         config.save(file);
         assertTrue(HeartlineConfig.load(file).cascadeHearts());
     }
+
+    @Test
+    void vanillaNamesHideOnlyWhileEnabled() throws IOException {
+        Path file = dir.resolve("heartline.json");
+        HeartlineConfig config = new HeartlineConfig();
+        assertFalse(config.hidesVanillaNames());
+        config.setVanillaNames(false);
+        assertTrue(config.hidesVanillaNames());
+        config.setEnabled(false);
+        assertFalse(config.hidesVanillaNames());
+        config.save(file);
+        assertFalse(HeartlineConfig.load(file).vanillaNames());
+        config.resetToDefaults();
+        assertTrue(config.vanillaNames());
+    }
 }

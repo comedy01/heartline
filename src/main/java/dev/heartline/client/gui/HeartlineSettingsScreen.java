@@ -39,15 +39,15 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
         addHeader(Texts.translatable("heartline.options.section.bars"));
         addRow(
                 toggle("heartline.options.overhead", config::overhead, config::setOverhead),
-                cycle("heartline.options.panel", PanelPosition.values(), config::panel, config::setPanel));
+                cycle("heartline.options.visibility", Visibility.values(), config::visibility, config::setVisibility));
         addRow(
-                cycle("heartline.options.visibility", Visibility.values(), config::visibility, config::setVisibility),
                 slider("heartline.options.range", HeartlineConfig.MIN_RANGE, HeartlineConfig.MAX_RANGE, 4,
-                        config.range(), value -> Integer.toString((int) value), value -> config.setRange((int) value)));
+                        config.range(), value -> Integer.toString((int) value), value -> config.setRange((int) value)),
+                toggle("heartline.options.line_of_sight", config::lineOfSight, config::setLineOfSight));
         addRow(
-                toggle("heartline.options.line_of_sight", config::lineOfSight, config::setLineOfSight),
                 slider("heartline.options.fade", HeartlineConfig.MIN_FADE, HeartlineConfig.MAX_FADE, 1,
-                        config.fadeSeconds(), value -> (int) value + "s", value -> config.setFadeSeconds((int) value)));
+                        config.fadeSeconds(), value -> (int) value + "s", value -> config.setFadeSeconds((int) value)),
+                toggle("heartline.options.trail", config::trail, config::setTrail));
         addRow(
                 cycle("heartline.options.style", BarStyle.values(), config::style, config::setStyle),
                 cycle("heartline.options.colors", ColorMode.values(), config::colors, config::setColors));
@@ -63,8 +63,8 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
                 toggle("heartline.options.name_players", config::namePlayers, config::setNamePlayers),
                 toggle("heartline.options.name_mobs", config::nameMobs, config::setNameMobs));
         addRow(
-                toggle("heartline.options.armor", config::armor, config::setArmor),
-                toggle("heartline.options.trail", config::trail, config::setTrail));
+                toggle("heartline.options.vanilla_names", config::vanillaNames, config::setVanillaNames),
+                toggle("heartline.options.armor", config::armor, config::setArmor));
         addRow(
                 slider("heartline.options.heart_rows", HeartlineConfig.MIN_HEART_ROWS, HeartlineConfig.MAX_HEART_ROWS,
                         1, config.heartRows(), value -> Integer.toString((int) value),
@@ -94,13 +94,14 @@ public final class HeartlineSettingsScreen extends HeartlineOptionsScreen {
 
         addHeader(Texts.translatable("heartline.options.section.panel"));
         addRow(
-                toggle("heartline.options.hits_to_kill", config::hitsToKill, config::setHitsToKill),
-                toggle("heartline.options.pet_alert", config::petAlert, config::setPetAlert));
+                cycle("heartline.options.panel", PanelPosition.values(), config::panel, config::setPanel),
+                toggle("heartline.options.hits_to_kill", config::hitsToKill, config::setHitsToKill));
         addRow(
+                toggle("heartline.options.pet_alert", config::petAlert, config::setPetAlert),
                 slider("heartline.options.pet_alert_percent", HeartlineConfig.MIN_PET_ALERT,
                         HeartlineConfig.MAX_PET_ALERT, 5, config.petAlertPercent(), value -> (int) value + "%",
-                        value -> config.setPetAlertPercent((int) value)),
-                resetButton(config));
+                        value -> config.setPetAlertPercent((int) value)));
+        addRow(resetButton(config), null);
     }
 
     @Override

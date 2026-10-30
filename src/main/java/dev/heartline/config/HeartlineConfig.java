@@ -62,6 +62,7 @@ public final class HeartlineConfig {
     private boolean names = true;
     private boolean namePlayers = true;
     private boolean nameMobs = true;
+    private boolean vanillaNames = true;
     private int heartRows = 2;
     private boolean cascadeHearts = false;
     private HealthText healthText = HealthText.VALUE;
@@ -222,6 +223,18 @@ public final class HeartlineConfig {
 
     public void setNameMobs(boolean value) {
         nameMobs = value;
+    }
+
+    public boolean vanillaNames() {
+        return vanillaNames;
+    }
+
+    public void setVanillaNames(boolean value) {
+        vanillaNames = value;
+    }
+
+    public boolean hidesVanillaNames() {
+        return enabled && !vanillaNames;
     }
 
     public boolean showsName(boolean player) {
@@ -443,6 +456,7 @@ public final class HeartlineConfig {
         names = other.names;
         namePlayers = other.namePlayers;
         nameMobs = other.nameMobs;
+        vanillaNames = other.vanillaNames;
         heartRows = other.heartRows;
         cascadeHearts = other.cascadeHearts;
         healthText = other.healthText;
